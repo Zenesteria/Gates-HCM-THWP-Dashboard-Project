@@ -42,7 +42,7 @@ total_patients = len(patients_df)
 formatted_total_patients = "{:,}".format(total_patients)
 total_lgas = 1  # len(lgas_df)
 total_wards = len(wards_df)
-total_facilities = len(facilities_df)
+total_facilities = 24  # len(facilities_df)
 # Registration - Gender
 male_patients = patients_df.query('gender in ["male", "Male"]').shape[0]
 female_patients = patients_df.query('gender in ["female", "Female"]').shape[0]

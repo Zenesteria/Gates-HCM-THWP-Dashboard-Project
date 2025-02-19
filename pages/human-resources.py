@@ -110,83 +110,6 @@ def layout():
                                 ],
                                 className="mb-4",
                             ),
-                            # Display the indicators
-                            # dbc.Row(
-                            #     [
-                            #         dbc.Col(
-                            #             dbc.Card(
-                            #                 dbc.CardBody(
-                            #                     [
-                            #                         html.H4(
-                            #                             "Registered Employees:",
-                            #                             className="card-title",
-                            #                         ),
-                            #                         html.H5(
-                            #                             formatted_total_employees,
-                            #                             className="card-text",
-                            #                         ),
-                            #                     ]
-                            #                 ),
-                            #                 className="card text-white bg-success mb-4",
-                            #             ),
-                            #             width=3,
-                            #         ),
-                            #         dbc.Col(
-                            #             dbc.Card(
-                            #                 dbc.CardBody(
-                            #                     [
-                            #                         html.H4(
-                            #                             "Male Employees:",
-                            #                             className="card-title",
-                            #                         ),
-                            #                         html.H5(
-                            #                             formatted_male_percentage,
-                            #                             className="card-text",
-                            #                         ),
-                            #                     ]
-                            #                 ),
-                            #                 className="card text-white bg-success mb-4",
-                            #             ),
-                            #             width=3,
-                            #         ),
-                            #         dbc.Col(
-                            #             dbc.Card(
-                            #                 dbc.CardBody(
-                            #                     [
-                            #                         html.H4(
-                            #                             "Female Employees(%):",
-                            #                             className="card-title",
-                            #                         ),
-                            #                         html.H5(
-                            #                             formatted_female_percentage,
-                            #                             className="card-text",
-                            #                         ),
-                            #                     ]
-                            #                 ),
-                            #                 className="card text-white bg-success mb-4",
-                            #             ),
-                            #             width=3,
-                            #         ),
-                            #         dbc.Col(
-                            #             dbc.Card(
-                            #                 dbc.CardBody(
-                            #                     [
-                            #                         html.H4(
-                            #                             "Employees with Disabilities:",
-                            #                             className="card-title",
-                            #                         ),
-                            #                         html.H5(
-                            #                             formatted_disability_status_percentage,
-                            #                             className="card-text",
-                            #                         ),
-                            #                     ]
-                            #                 ),
-                            #                 className="card text-white bg-success mb-4",
-                            #             ),
-                            #             width=3,
-                            #         ),
-                            #     ]
-                            # ),
                             # 1 - charts
                             dbc.Row(
                                 [
@@ -238,9 +161,6 @@ def layout():
                                         [
                                             html.Div(
                                                 [
-                                                    # dcc.Graph(
-                                                    #     id="percentage-distribution-by-cadre"
-                                                    # ),
                                                     dcc.Graph(
                                                         id="percentage-distribution-by-cadre_treemap"
                                                     )
@@ -264,9 +184,6 @@ def layout():
                                         [
                                             html.Div(
                                                 [
-                                                    # dcc.Graph(
-                                                    #     id="employee-percentage-by-employment-type"
-                                                    # ),
                                                     dcc.Graph(
                                                         id="employee-percentage-by-employment-type_sb"
                                                     ),

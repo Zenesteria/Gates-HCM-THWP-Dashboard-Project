@@ -141,7 +141,6 @@ def prepare_employee_percentage_by_employment_type(filtered_df, facility=None):
     # Apply filters
     filtered_df = filtered_df.copy()
     if facility:
-        # filtered_df = filtered_df[filtered_df["facility_stationed"] == facility]
         # Since facility is a list (multi-select), use .isin() to filter
         filtered_df = filtered_df[filtered_df["facility_stationed"].isin(facility)]
 
@@ -154,6 +153,11 @@ def prepare_employee_percentage_by_employment_type(filtered_df, facility=None):
     employment_type_counts["percentage"] = (
         employment_type_counts["counts"] / employment_type_counts["counts"].sum()
     ) * 100
+
+    # Sort alphabetically by employment type
+    employment_type_counts = employment_type_counts.sort_values(
+        by="employment_type", ascending=False
+    )
 
     return employment_type_counts
 
@@ -176,49 +180,6 @@ def prepare_emp_count_stackedbar(filtered_df, facility=None):
         employment_counts["total_workers"] / employment_counts["total_workers"].sum()
     ) * 100
     return employment_counts
-
-
-# def prepare_cadre_treemap_data(filtered_df, facility=None):
-#     # Apply filters
-#     filtered_df = filtered_df.copy()
-#     if facility:
-#         # filtered_df = filtered_df[filtered_df["facility_stationed"] == facility]
-#         # Since facility is a list (multi-select), use .isin() to filter
-#         filtered_df = filtered_df[filtered_df["facility_stationed"].isin(facility)]
-
-#     # Clean and check for missing values in 'cadre'
-#     # fill missing values with 'Unknown'
-#     filtered_df["cadre"] = filtered_df["cadre"].fillna("Unknown")
-
-#     # Create a mock total number of health workers for demonstration purposes
-#     filtered_df["Total No. of Health Workers"] = filtered_df.groupby("cadre")[
-#         "cadre"
-#     ].transform("count")
-
-#     # Calculate percentage distribution of health workers by cadre
-#     total_health_workers = filtered_df["Total No. of Health Workers"].sum()
-#     filtered_df["% Distribution"] = (
-#         filtered_df["Total No. of Health Workers"] / total_health_workers
-#     ) * 100
-
-#     # Format the column to show whole numbers (without decimals) for clarity
-#     filtered_df["% Distribution"] = filtered_df["% Distribution"].round(
-#         2
-#     )  # Round to 2 decimal places
-
-#     # Group the data by 'cadre' and calculate the total number of health workers and percentage distribution
-#     top_10_cadres_df = (
-#         filtered_df.groupby("cadre")
-#         .agg({"Total No. of Health Workers": "sum", "% Distribution": "mean"})
-#         .reset_index()
-#     )
-
-#     # Sort by 'Total No. of Health Workers' and take the top 10 cadres
-#     top_10_cadres_df = top_10_cadres_df.sort_values(
-#         by="Total No. of Health Workers", ascending=False
-#     ).head(10)
-
-#     return top_10_cadres_df
 
 
 def prepare_cadre_treemap_data(filtered_df, facility=None):
@@ -263,44 +224,25 @@ def prepare_cadre_treemap_data(filtered_df, facility=None):
 
 
 # Load the CSV file
-# employee_timecard_df = pd.read_csv("data/CSVs/cleaned_hrh_timecard_data.csv")
+df = pd.read_csv("data/CSVs/cleaned_hrh_timecard_data.csv")
 
-# # Ensure date and time columns are in the correct format
-# df["date"] = pd.to_datetime(df["date"])
-# df["clockin_time"] = pd.to_datetime(df["clockin_time"], format="%H:%M:%S").dt.time
+# Ensure date and time columns are in the correct format
+df["date"] = pd.to_datetime(df["date"])
+df["clockin_time"] = pd.to_datetime(df["clockin_time"], format="%H:%M:%S").dt.time
 
-# # Extract hour from clockin_time
-# df["clockin_hour"] = pd.to_datetime(df["clockin_time"], format="%H:%M:%S").dt.hour
+# Extract hour from clockin_time
+df["clockin_hour"] = pd.to_datetime(df["clockin_time"], format="%H:%M:%S").dt.hour
 
-# # Extract day of the week from the date
-# df["weekday"] = df["date"].dt.day_name()
+# Extract day of the week from the date
+df["weekday"] = df["date"].dt.day_name()
 
-# # Now aggregate data for the time series plot and heatmap
-# # Time series: Count of employees per date
-# time_series_data = (
-#     df.groupby("date")["employee_id"].nunique().reset_index(name="employee_count")
-# )
 
-# # Heatmap: Count employees for each hour of the day and weekday
-# heatmap_data = (
-#     df.groupby(["clockin_hour", "weekday"])["employee_id"].nunique().reset_index()
-# )
-# heatmap_data_pivot = heatmap_data.pivot(
-#     index="clockin_hour", columns="weekday", values="employee_id"
-# )
-
-# # Sorting weekdays in order
-# weekday_order = [
-#     "Monday",
-#     "Tuesday",
-#     "Wednesday",
-#     "Thursday",
-#     "Friday",
-#     "Saturday",
-#     "Sunday",
-# ]
-# heatmap_data_pivot = heatmap_data_pivot[weekday_order]
-
+# Custom color scale
+custom_colorscale = [
+    [0, "lightgreen"],  # Low values
+    [0.5, "yellow"],  # Midpoint values
+    [1, "darkred"],  # High values
+]
 
 ###### CALLBACKS
 
@@ -340,7 +282,7 @@ def register_visitation_page_callbacks(app):
                 filtered_df["facility_name"].isin(selected_facilities)
             ]
 
-        print("Filtered DataFrame Shape:", filtered_df.shape)  # Debugging Output
+        # print("Filtered DataFrame Shape:", filtered_df.shape)  # Debugging Output
 
         # **Handle empty dataset**
         if filtered_df.empty:
@@ -354,7 +296,7 @@ def register_visitation_page_callbacks(app):
             hole=0.4,
             color_discrete_sequence=[
                 "#062d14",
-                "#ddfbe6",
+                "#18a145",
             ],  # Custom colors
         )
 
@@ -697,7 +639,7 @@ def register_hr_page_callbacks(app):
             hovertemplate="<b>Age Group:</b> %{x}<br><b>Counts:</b> %{y}<extra></extra>"
         )
         fig.update_layout(
-            showlegend=True,  # Remove legend
+            showlegend=False,  # Remove legend
             plot_bgcolor="rgba(0,0,0,0)",  # Transparent plot background
             paper_bgcolor="rgba(0,0,0,0)",  # Transparent figure background
             title={
@@ -820,25 +762,33 @@ def register_hr_page_callbacks(app):
         ],
     )
     def update_employee_percentage_by_employment_type_stackedbar(facility):
-        employment_counts = prepare_emp_count_stackedbar(merged_hr_data, facility)
+        employment_counts = prepare_employee_percentage_by_employment_type(
+            merged_hr_data, facility
+        )
+
+        # Sort by employment_type to ensure the order is consistent for bars and legend
+        employment_counts = employment_counts.sort_values("employment_type")
 
         # Create a stacked bar chart with multiple segments for each employment type
         fig = go.Figure()
 
         # Define the colors for the employment types
-        colors = ["#062d14", "#15522a", "#165e2e", "#177e38"]
+        colors = [
+            "#062d14",
+            "#165e2e",
+            "#18a145",
+            "#4cdc7a",
+        ]
 
         # Add a segment for each employment type in the stacked bar
         for i, row in employment_counts.iterrows():
             fig.add_trace(
                 go.Bar(
-                    x=[
-                        row["percent_health_workers"]
-                    ],  # Percentage for this employment type
+                    x=[row["percentage"]],  # Percentage for this employment type
                     name=row["employment_type"],  # Employment type as the label
                     orientation="h",
-                    hovertemplate=f"{row['employment_type']}: {row['percent_health_workers']:.2f}%",
-                    text=f"{row['employment_type']}: {row['percent_health_workers']:.2f}%",
+                    hovertemplate=f"Employment Type: {row['employment_type']}<br>Count: {row['counts']}<br>Percentage: {row['percentage']:.2f}%<extra></extra>",
+                    text=f"{row['employment_type']}: {row['percentage']:.2f}%",
                     textposition="none",  # Hide the text inside the bar
                     marker_color=colors[
                         i % len(colors)
@@ -916,6 +866,81 @@ def register_hr_page_callbacks(app):
         return fig
 
 
+def register_attendance_callbacks(app):
+    # Callback to update charts based on selected year and date range
+    # Callback to update charts based on selected year and date range
+    @app.callback(
+        [Output("time-series", "figure"), Output("heatmap", "figure")],
+        [
+            Input("year-dropdown", "value"),
+            Input("date-range", "start_date"),
+            Input("date-range", "end_date"),
+        ],
+    )
+    def update_charts(selected_year, start_date, end_date):
+        # Initially use the entire dataset
+        filtered_df = df.copy()
+
+        # Filter data based on the selected date range
+        filtered_df = filtered_df[
+            (filtered_df["date"] >= start_date) & (filtered_df["date"] <= end_date)
+        ]
+
+        if selected_year:
+            # Filter data based on selected year
+            filtered_df = df[df["date"].dt.year == selected_year]
+
+        # Prepare time series data
+        time_series_data = (
+            filtered_df.groupby("date")["employee_id"]
+            .nunique()
+            .reset_index(name="employee_count")
+        )
+
+        # Prepare heatmap data (group by clockin_hour and weekday)
+        heatmap_data = (
+            filtered_df.groupby(["clockin_hour", "weekday"])["employee_id"]
+            .nunique()
+            .reset_index()
+        )
+        heatmap_data_pivot = heatmap_data.pivot(
+            index="clockin_hour", columns="weekday", values="employee_id"
+        )
+
+        # Ensure weekdays are ordered correctly
+        weekday_order = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ]
+        heatmap_data_pivot = heatmap_data_pivot[weekday_order]
+
+        # Create time series plot
+        time_series_fig = px.line(
+            time_series_data,
+            x="date",
+            y="employee_count",
+            title="Employee Count Over Time",
+        )
+
+        # Create heatmap with custom color scale
+        heatmap_fig = px.imshow(
+            heatmap_data_pivot,
+            labels=dict(x="Weekday", y="Hour of Day", color="Employee Count"),
+            x=weekday_order,
+            y=heatmap_data_pivot.index,
+            title="Employee Count Heatmap (Hour vs Weekday)",
+            aspect="auto",
+            color_continuous_scale=custom_colorscale,  # Apply custom color scale
+        )
+
+        return time_series_fig, heatmap_fig
+
+
 # Define the function for registering callbacks for each page with multiple IDs
 def register_filter_callbacks(
     app, state_filter, lga_filter, ward_filter, facility_filter
@@ -974,3 +999,5 @@ def register_callbacks(app):
     )
 
     register_hr_page_callbacks(app)
+
+    register_attendance_callbacks(app)

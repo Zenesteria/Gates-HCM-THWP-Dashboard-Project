@@ -48,13 +48,13 @@ navbar = dbc.Navbar(
                                 className="nav-link",
                             )
                         ),
-                        # dbc.NavItem(
-                        #     dcc.Link(
-                        #         "Attendance",
-                        #         href="/attendance",
-                        #         className="nav-link",
-                        #     )
-                        # ),
+                        dbc.NavItem(
+                            dcc.Link(
+                                "Attendance",
+                                href="/attendance",
+                                className="nav-link",
+                            )
+                        ),
                         dbc.NavItem(
                             dcc.Link(
                                 "Visitation", href="/visitation", className="nav-link"
