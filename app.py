@@ -5,6 +5,7 @@ from components.callbacks import register_callbacks
 
 # Create the Dash app with multipage support
 app = dash.Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 
 navbar = dbc.Navbar(
     dbc.Container(
